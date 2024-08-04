@@ -7,7 +7,8 @@ from tile_entities import Flower, HoneyBeeHive, DesertBeeHive, WaspHive, Wasp, D
 errors = {"INVALID_INPUT": "ERROR: Invalid argument: ", "TOO_FEW_ARGUMENTS":
           "ERROR: Too few arguments", "TOO_MANY_ARGUMENTS": "ERROR: Too many arguments",
           "INVALID_CONFIGURATION": "ERROR: Invalid configuration line", "INVALID_OBJECT": "ERROR: Invalid object setup on line ",
-          "FLOWER_OCCUPIED": "ERROR: Cannot place flower at already occupied location", "HIVE_OCCUPIED": "ERROR: Cannot place hive at already occupied location", }
+          "FLOWER_OCCUPIED": "ERROR: Cannot place flower at already occupied location",
+          "HIVE_OCCUPIED": "ERROR: Cannot place hive at already occupied location", }
 simulation = Simulation()
 
 
@@ -26,20 +27,18 @@ def read_input_from_cmd():
         simulation.change_gui_mode(bool(sys.argv[1]))
 
 
-def read_board_input():
+def read_map():
     # get the board configuration and the board setup from input
-    line_number = 0
+    line_number = [0] # do some pyhton pass by object reference magic
     while True:
         if not stdio.hasNextLine():
             break
         line = stdio.readLine().strip().split()
-        if line == ['#']:
-            break
-        if line_number == 0:
+        if line_number == [0]:
             handle_configuration_line(line)
         else:
-            handle_board_line(line, line_number)
-        line_number += 1
+            handle_board_line(line,line_number)
+        line_number[0] += 1
 
 
 def handle_configuration_line(line):
@@ -69,19 +68,6 @@ def handle_configuration_line(line):
     simulation.change_sorting_mode(line[3])
 
 
-def get_position_and_entities(line):
-    col = int(line[1])
-    row = int(line[2])
-    num_entities = int(line[3])
-    return col, row, num_entities
-
-
-def validate_position(row, col, error_message):
-    if not simulation.is_valid_position(row, col):
-        stdio.write(error_message + f" ({str(col)},{str(row)})")
-        sys.exit(1)
-
-
 def handle_board_line(line, line_number):
     try:
         if line[0] == 'F':
@@ -95,9 +81,10 @@ def handle_board_line(line, line_number):
                 if simulation.pollen_type == 'f':
                     if not line.isdigit():
                         stdio.write(
-                            errors["INVALID_OBJECT"] + str(line_number))
+                            errors["INVALID_OBJECT"] + str(line_number[0]))
                         sys.exit(1)
                 pollen_information.append(line)
+                line_number[0] += 1        
                 num_pollen -= 1
             new_flower = Flower(row, col, simulation.pollen_type)
 
@@ -111,6 +98,7 @@ def handle_board_line(line, line_number):
             validate_position(row, col, errors["HIVE_OCCUPIED"])
 
             line = stdio.readLine().strip().split()
+            line_number[0] += 1
             speed = int(line[0])
             perception_range = int(line[1])
             new_hive = HoneyBeeHive(row, col, num_entities)
@@ -124,6 +112,7 @@ def handle_board_line(line, line_number):
             validate_position(row, col, errors["HIVE_OCCUPIED"])
 
             line = stdio.readLine().strip().split()
+            line_number[0] += 1
             speed = int(line[0])
             perception_range = int(line[1])
             new_hive = BeeHive(row, col, num_entities)
@@ -137,6 +126,7 @@ def handle_board_line(line, line_number):
             validate_position(row, col, errors["HIVE_OCCUPIED"])
 
             line = stdio.readLine().strip().split()
+            line_number[0] += 1
             speed = int(line[0])
             perception_range = int(line[1])
             new_hive = DesertBeeHive(row, col, num_entities)
@@ -150,6 +140,7 @@ def handle_board_line(line, line_number):
             validate_position(row, col, errors["HIVE_OCCUPIED"])
 
             line = stdio.readLine().strip().split()
+            line_number[0] += 1
             speed = int(line[0])
             new_hive = WaspHive(row, col, num_entities)
 
@@ -157,11 +148,23 @@ def handle_board_line(line, line_number):
                 new_hive.add_wasp(Wasp(row, col, speed))
             simulation.add_entity(row, col, new_hive)
         else:
-            stdio.write(errors["INVALID_OBJECT"] + str(line_number))
+            stdio.write(errors["INVALID_OBJECT"] + str(line_number[0]))
             sys.exit(1)
-    except (ValueError, IndexError, TypeError):
-        # TODO fix th line number being from considering the pollen information
-        stdio.write(errors["INVALID_OBJECT"] + str(line_number))
+    except (ValueError, IndexError, TypeError,EOFError):
+        stdio.write(errors["INVALID_OBJECT"] + str(line_number[0]))
+        sys.exit(1)
+
+
+def get_position_and_entities(line):
+    col = int(line[1])
+    row = int(line[2])
+    num_entities = int(line[3])
+    return col, row, num_entities
+
+
+def validate_position(row, col, error_message):
+    if not simulation.is_valid_position(row, col):
+        stdio.write(error_message + f" ({str(col)},{str(row)})")
         sys.exit(1)
 
 
@@ -169,7 +172,7 @@ def main():
 
     # main game loop
     read_input_from_cmd()
-    read_board_input()
+    read_map()
     simulation.print_board()
 
 
