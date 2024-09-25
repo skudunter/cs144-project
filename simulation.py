@@ -47,7 +47,7 @@ class Simulation:
             stdio.writeln(row_str)
             stdio.writeln(top_border)
 
-    def get_cell_display(self,cell):
+    def get_cell_display(self, cell):
         # TODO implement multiple things on one cell business
         if len(cell) == 0:
             return " "
@@ -64,15 +64,20 @@ class Simulation:
                 for col in range(self.size):
                     for object in self.board[row][col]:
                         print(type(object).__name__)
-                        if(type(object).__name__ == "Bee"):
-                            new_row, new_col = object.get_next_move()
-                            if (new_row < 0):
-                                new_row = 0
-                            if (new_col < 0):
-                                new_col = 0
-                            if (new_row >= self.size):
-                                new_row = self.size - 1
-                            if (new_col >= self.size):
-                                new_col = self.size - 1
-                            self.board[row][col].remove(object)
-                            self.board[new_row][new_col].append(object)
+                        if (type(object).__name__ == "Bee"):
+                            self.move_bee(object)
+
+    def move_bee(self,object):
+        new_row, new_col = object.get_next_move()
+        if (new_row < 0):
+            new_row = 0
+        if (new_col < 0):
+            new_col = 0
+        if (new_row >= self.size):
+            new_row = self.size - 1
+        if (new_col >= self.size):
+            new_col = self.size - 1
+        self.board[object.row][object.col].remove(object)
+        object.row = new_row
+        object.col = new_col
+        self.board[new_row][new_col].append(object)

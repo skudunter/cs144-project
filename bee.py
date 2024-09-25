@@ -10,6 +10,7 @@ class Bee:
         self.compass = Compass(row, col, speed)
         self.flower = None
         self.perception = perception
+        self.home_hive
 
     def get_next_move(self):
         if self.flower is None:
