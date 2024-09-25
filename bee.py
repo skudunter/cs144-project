@@ -1,10 +1,9 @@
 from compass import Compass
-from beehive import BeeHive
 import math
 
 
 class Bee:
-    def __init__(self, row: int, col: int, speed: int, perception: int,home_hive:BeeHive):
+    def __init__(self, row: int, col: int, speed: int, perception: int,home_hive = None):
         self.icon = 'b'
         self.row = row
         self.col = col
@@ -40,19 +39,19 @@ class Bee:
 
 class Wasp(Bee):
     def __init__(self, row: int, col: int, speed: int):
-        super().__init__(row, col, speed, perception=0)
+        super().__init__(row, col, speed, perception=0,home_hive=None)
         self.icon = 'w'
 
 
 class HoneyBee(Bee):
-    def __init__(self, row: int, col: int, speed: int, perception: int):
-        super().__init__(row, col, speed, perception)
+    def __init__(self, row: int, col: int, speed: int, perception: int,home_hive=None):
+        super().__init__(row, col, speed, perception,home_hive=None)
         self.icon = 'h'
 
 
 class DesertBee(Bee):
-    def __init__(self, row: int, col: int, speed: int, perception: int):
-        super().__init__(row, col, speed, perception)
+    def __init__(self, row: int, col: int, speed: int, perception: int,home_hive=None):
+        super().__init__(row, col, speed, perception,home_hive=None)
         self.icon = 'd'
 
 

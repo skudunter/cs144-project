@@ -110,7 +110,7 @@ def handle_board_line(line, line_number):
             new_hive = HoneyBeeHive(row, col, num_entities)
 
             for _ in range(num_entities):
-                simulation.add_entity(HoneyBee(row, col, speed, perception_range))
+                simulation.add_entity(HoneyBee(row, col, speed, perception_range, new_hive))
             simulation.add_entity(row, col, new_hive)
         elif line[0] == 'B':
             col, row, num_entities = get_position_and_entities(line)
@@ -124,7 +124,7 @@ def handle_board_line(line, line_number):
             new_hive = BeeHive(row, col, num_entities)
 
             for _ in range(num_entities):
-                simulation.add_entity(Bee(row, col, speed, perception_range))
+                simulation.add_entity(Bee(row, col, speed, perception_range, new_hive))
             simulation.add_entity(row, col, new_hive)
         elif line[0] == 'D':
             col, row, num_entities = get_position_and_entities(line)
@@ -138,7 +138,7 @@ def handle_board_line(line, line_number):
             new_hive = DesertBeeHive(row, col, num_entities)
 
             for _ in range(num_entities):
-                simulation.add_entity(DesertBee(row, col, speed, perception_range))
+                simulation.add_entity(DesertBee(row, col, speed, perception_range,new_hive))
             simulation.add_entity(row, col, new_hive)
         elif line[0] == 'W':
             col, row, num_entities = get_position_and_entities(line)
