@@ -176,39 +176,7 @@ def validate_position(row, col, error_message):
 
 def do_main_game_loop():
     simulation.update()
-
-
-def test_compass(row, col, speed, map_size, iterations):
-    compass = Compass(row, col, speed)
-    if (compass.is_scout()):
-        compass.speed *= 2
-    movements = [(row, col)]
-    new_row = row
-    new_col = col
-    for _ in range(iterations):
-        next_trajectory = compass.get_next_trajectory()
-        displacement = convert_radian_to_tuple(
-            next_trajectory.get_direction_in_radians())
-        distance = next_trajectory.get_distance()
-        new_col += int(displacement[0] * distance)
-        new_row += int(displacement[1] * distance)
-
-        if new_row < 0:
-            new_row = 0
-        elif new_row >= map_size:
-            new_row = map_size - 1
-        if new_col < 0:
-            new_col = 0
-        elif new_col >= map_size:
-            new_col = map_size - 1
-        movements.append((new_row, new_col))
-
-    for movement in movements:
-        stdio.write(str(movement[0]) + ', ' + str(movement[1]) + "\n")
-
-
-def convert_radian_to_tuple(radians):
-    return (round(math.cos(radians)), round(math.sin(radians)))
+    # code to be ran after the simulation is done
 
 
 def main():

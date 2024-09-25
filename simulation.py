@@ -1,10 +1,12 @@
 import stdio
+import time
 
 
 class Simulation:
     def __init__(self):
         self.is_gui_mode = False
         self.size = 50
+        self.simulation_speed = 1
         self.simulation_steps = 100
         self.pollen_type = 'f'
         self.sorting_type = 'max'
@@ -51,13 +53,18 @@ class Simulation:
         return self.board[row][col] == 0
 
     def update(self):
-        for row in range(self.size):
-            for col in range(self.size):
-                if self.board[row][col] != 0:
-                    tile_entity = self.board[row][col]
-                    # TODO make not so hacky
-                    try:
-                        for child in tile_entity.children:
-                            child.move()
-                    except:
-                        pass
+        for i in range(self.simulation_steps):
+            time.sleep(self.simulation_speed)
+            for row in range(self.size):
+                for col in range(self.size):
+                    if self.board[row][col] != 0:
+                        tile_entity = self.board[row][col]
+                        # TODO make not so hacky
+                        try:
+                            for child in tile_entity.children:
+                                new_row, new_col = child.get_next_move()
+                                if self.is_valid_position(new_row, new_col):
+                                    self.board[row][col] = 0
+                                    self.board[new_row][new_col] = child
+                        except:
+                            pass

@@ -1,24 +1,57 @@
 from compass import Compass
+import math
+
+
 class Bee:
     def __init__(self, row: int, col: int, speed: int, perception: int):
         self.icon = 'b'
+        self.row = row
+        self.col = col
         self.compass = Compass(row, col, speed)
+        self.flower = None
+        self.perception = perception
 
-    def move(self):
+    def get_next_move(self):
+        if self.flower is None:
+            return self.do_random_walk()
+        else:
+            return self.do_perception_walk()
+
+    def do_random_walk(self):
         next_trajectory = self.compass.get_next_trajectory()
-        print(next_trajectory)
+        displacement = convert_radian_to_tuple(
+            next_trajectory.get_direction_in_radians())
+        distance = next_trajectory.get_distance()
+        new_col = int(displacement[0] * distance)
+        new_row = int(displacement[1] * distance)
+        return new_row, new_col
+
+    def do_perception_walk(self):
+        flower_row, flower_col = self.flower.get_position()
+        row, col = self.compass.get_position()
+        if abs(flower_row - row) <= self.perception and abs(flower_col - col) <= self.perception:
+            return self.do_random_walk()
+        else:
+            return self.do_perception_walk()
 
 
-class Wasp:
+class Wasp(Bee):
     def __init__(self, row: int, col: int, speed: int):
+        super().__init__(row, col, speed, perception=0)
         self.icon = 'w'
 
 
-class HoneyBee:
+class HoneyBee(Bee):
     def __init__(self, row: int, col: int, speed: int, perception: int):
+        super().__init__(row, col, speed, perception)
         self.icon = 'h'
 
 
-class DesertBee:
+class DesertBee(Bee):
     def __init__(self, row: int, col: int, speed: int, perception: int):
+        super().__init__(row, col, speed, perception)
         self.icon = 'd'
+
+
+def convert_radian_to_tuple(radians):
+    return (round(math.cos(radians)), round(math.sin(radians)))
