@@ -49,3 +49,15 @@ class Simulation:
 
     def is_valid_position(self, row, col):
         return self.board[row][col] == 0
+
+    def update(self):
+        for row in range(self.size):
+            for col in range(self.size):
+                if self.board[row][col] != 0:
+                    tile_entity = self.board[row][col]
+                    # TODO make not so hacky
+                    try:
+                        for child in tile_entity.children:
+                            child.move()
+                    except:
+                        pass

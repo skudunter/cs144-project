@@ -1,7 +1,12 @@
 import stdio
 import sys
+import math
 from simulation import Simulation
-from tile_entities import Flower, HoneyBeeHive, DesertBeeHive, WaspHive, Wasp, DesertBee, HoneyBee, Pollen, BeeHive, Bee
+from bee import Bee, DesertBee, HoneyBee, Wasp
+from beehive import BeeHive, DesertBeeHive, HoneyBeeHive, WaspHive
+from flower import Flower, Pollen
+from compass import Compass
+
 
 errors = {"INVALID_INPUT": "ERROR: Invalid argument: ", "TOO_FEW_ARGUMENTS":
           "ERROR: Too few arguments", "TOO_MANY_ARGUMENTS": "ERROR: Too many arguments",
@@ -11,7 +16,7 @@ errors = {"INVALID_INPUT": "ERROR: Invalid argument: ", "TOO_FEW_ARGUMENTS":
 simulation = Simulation()
 
 
-def read_input_from_cmd():
+def read_cmd_arguments():
     # read input from command line and check if it is valid
     if (len(sys.argv) < 2):
         stdio.write(errors["TOO_FEW_ARGUMENTS"])
@@ -26,9 +31,9 @@ def read_input_from_cmd():
         simulation.change_gui_mode(bool(sys.argv[1]))
 
 
-def read_map():
+def read_map_input():
     # get the board configuration and the board setup from input
-    line_number = [-1] # do some pyhton pass by object reference magic
+    line_number = [-1]
     while True:
         if not stdio.hasNextLine():
             break
@@ -38,7 +43,7 @@ def read_map():
             line_number[0] += 1
         else:
             line_number[0] += 1
-            handle_board_line(line,line_number)
+            handle_board_line(line, line_number)
 
 
 def handle_configuration_line(line):
@@ -69,6 +74,7 @@ def handle_configuration_line(line):
 
 
 def handle_board_line(line, line_number):
+    # handle each line of the board setup
     try:
         if line[0] == 'F':
             col, row, num_pollen = get_position_and_entities(line)
@@ -77,7 +83,7 @@ def handle_board_line(line, line_number):
             while num_pollen > 0:
                 if not stdio.hasNextLine():
                     break
-                line_number[0] += 1        
+                line_number[0] += 1
                 line = stdio.readLine().strip()
                 if simulation.pollen_type == 'f':
                     if not line.isdigit():
@@ -150,7 +156,7 @@ def handle_board_line(line, line_number):
         else:
             stdio.write(errors["INVALID_OBJECT"] + str(line_number[0]))
             sys.exit(1)
-    except (ValueError, IndexError, TypeError,EOFError):
+    except (ValueError, IndexError, TypeError, EOFError):
         stdio.write(errors["INVALID_OBJECT"] + str(line_number[0]))
         sys.exit(1)
 
@@ -168,11 +174,49 @@ def validate_position(row, col, error_message):
         sys.exit(1)
 
 
+def do_main_game_loop():
+    simulation.update()
+
+
+def test_compass(row, col, speed, map_size, iterations):
+    compass = Compass(row, col, speed)
+    if (compass.is_scout()):
+        compass.speed *= 2
+    movements = [(row, col)]
+    new_row = row
+    new_col = col
+    for _ in range(iterations):
+        next_trajectory = compass.get_next_trajectory()
+        displacement = convert_radian_to_tuple(
+            next_trajectory.get_direction_in_radians())
+        distance = next_trajectory.get_distance()
+        new_col += int(displacement[0] * distance)
+        new_row += int(displacement[1] * distance)
+
+        if new_row < 0:
+            new_row = 0
+        elif new_row >= map_size:
+            new_row = map_size - 1
+        if new_col < 0:
+            new_col = 0
+        elif new_col >= map_size:
+            new_col = map_size - 1
+        movements.append((new_row, new_col))
+
+    for movement in movements:
+        stdio.write(str(movement[0]) + ', ' + str(movement[1]) + "\n")
+
+
+def convert_radian_to_tuple(radians):
+    return (round(math.cos(radians)), round(math.sin(radians)))
+
+
 def main():
     # main game loop
-    read_input_from_cmd()
-    read_map()
+    read_cmd_arguments()
+    read_map_input()
     simulation.print_board()
+    do_main_game_loop()
 
 
 if __name__ == '__main__':
