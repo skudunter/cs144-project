@@ -49,9 +49,13 @@ class Simulation:
             stdio.writeln(top_border)
 
     def get_cell_display(self, cell):
-        # TODO implement multiple things on one cell business
+        # make sure that hives and flowers get priority
         if len(cell) == 0:
             return " "
+        icons = {'B', 'H', 'F', 'D', 'W'}
+        for obj in cell:
+            if obj.icon in icons:
+                return obj.icon
         return cell[0].icon
 
     def is_valid_position(self, row, col):
@@ -61,24 +65,22 @@ class Simulation:
         for i in range(self.simulation_steps):
             self.print_board()
             time.sleep(self.simulation_speed)
+            placeholder_board = [
+                [[] for _ in range(self.size)] for _ in range(self.size)]
             for row in range(self.size):
                 for col in range(self.size):
                     for object in self.board[row][col]:
-                        print(type(object).__name__)
-                        if (isinstance(object, Bee)):
-                            self.move_bee(object)
+                        if isinstance(object, Bee):
+                            self.move_bee(object, placeholder_board)
+                        else:
+                            placeholder_board[row][col].append(object)    
+            self.board = placeholder_board
 
-    def move_bee(self, object: Bee):
+
+    def move_bee(self, object: Bee, placeholder_board):
         new_row, new_col = object.get_next_move()
-        if (new_row < 0):
-            new_row = 0
-        if (new_col < 0):
-            new_col = 0
-        if (new_row >= self.size):
-            new_row = self.size - 1
-        if (new_col >= self.size):
-            new_col = self.size - 1
-        self.board[object.row][object.col].remove(object)
+        new_row = max(0, min(new_row, self.size - 1))
+        new_col = max(0, min(new_col, self.size - 1))
         object.row = new_row
         object.col = new_col
-        self.board[new_row][new_col].append(object)
+        placeholder_board[new_row][new_col].append(object)

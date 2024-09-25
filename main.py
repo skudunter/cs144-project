@@ -156,8 +156,7 @@ def handle_board_line(line, line_number):
         else:
             stdio.write(errors["INVALID_OBJECT"] + str(line_number[0]))
             sys.exit(1)
-    except (ValueError, IndexError, TypeError, EOFError) as e:
-        print(e)
+    except (ValueError, IndexError, TypeError, EOFError):
         stdio.write(errors["INVALID_OBJECT"] + str(line_number[0]))
         sys.exit(1)
 
