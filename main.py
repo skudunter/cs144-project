@@ -183,7 +183,6 @@ def main():
     # main game loop
     read_cmd_arguments()
     read_map_input()
-    simulation.print_board()
     do_main_game_loop()
 
 

@@ -16,7 +16,7 @@ class Simulation:
         self.is_gui_mode = new_mode
 
     def change_size(self, new_size):
-        self.board = [[0 for i in range(new_size)] for j in range(new_size)]
+        self.board = [[[] for _ in range(new_size)] for _ in range(new_size)]
         self.size = new_size
 
     def change_simulation_steps(self, new_simulation_steps):
@@ -32,7 +32,7 @@ class Simulation:
         return self.board
 
     def add_entity(self, row, col, entity):
-        self.board[row][col] = entity
+        self.board[row][col].append(entity)
 
     def print_board(self):
         header = "    " + " ".join(f"{col:03}" for col in range(self.size))
@@ -42,29 +42,37 @@ class Simulation:
         for row in range(self.size - 1, -1, -1):
             row_str = f"{row:03}|"
             for col in range(self.size):
-                cell = self.board[row][col].icon if self.board[row][col] != 0 else 0
-                if cell == 0:
-                    cell = " "
+                cell = self.get_cell_display(self.board[row][col])
                 row_str += f" {cell} |"
             stdio.writeln(row_str)
             stdio.writeln(top_border)
 
+    def get_cell_display(self,cell):
+        # TODO implement multiple things on one cell business
+        if len(cell) == 0:
+            return " "
+        return cell[0].icon
+
     def is_valid_position(self, row, col):
-        return self.board[row][col] == 0
+        return len(self.board[row][col]) == 0
 
     def update(self):
         for i in range(self.simulation_steps):
+            self.print_board()
             time.sleep(self.simulation_speed)
             for row in range(self.size):
                 for col in range(self.size):
-                    if self.board[row][col] != 0:
-                        tile_entity = self.board[row][col]
-                        # TODO make not so hacky
-                        try:
-                            for child in tile_entity.children:
-                                new_row, new_col = child.get_next_move()
-                                if self.is_valid_position(new_row, new_col):
-                                    self.board[row][col] = 0
-                                    self.board[new_row][new_col] = child
-                        except:
-                            pass
+                    for object in self.board[row][col]:
+                        print(type(object).__name__)
+                        if(type(object).__name__ == "Bee"):
+                            new_row, new_col = object.get_next_move()
+                            if (new_row < 0):
+                                new_row = 0
+                            if (new_col < 0):
+                                new_col = 0
+                            if (new_row >= self.size):
+                                new_row = self.size - 1
+                            if (new_col >= self.size):
+                                new_col = self.size - 1
+                            self.board[row][col].remove(object)
+                            self.board[new_row][new_col].append(object)

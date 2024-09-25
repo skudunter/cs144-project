@@ -22,11 +22,12 @@ class Bee:
         displacement = convert_radian_to_tuple(
             next_trajectory.get_direction_in_radians())
         distance = next_trajectory.get_distance()
-        new_col = int(displacement[0] * distance)
-        new_row = int(displacement[1] * distance)
-        return new_row, new_col
+        new_col, new_row = int(
+            displacement[0] * distance), int(displacement[1] * distance)
+        return new_row + self.row, new_col + self.col
 
     def do_perception_walk(self):
+        # TODO implement this
         flower_row, flower_col = self.flower.get_position()
         row, col = self.compass.get_position()
         if abs(flower_row - row) <= self.perception and abs(flower_col - col) <= self.perception:
