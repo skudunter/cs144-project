@@ -2,6 +2,7 @@ import stdio
 import time
 from bee import Bee, Wasp
 from beehive import BeeHive, HoneyBeeHive, DesertBeeHive, WaspHive
+from flower import Flower
 
 
 class Simulation:
@@ -70,15 +71,15 @@ class Simulation:
 
             placeholder_board = [
                 [[] for _ in range(self.size)] for _ in range(self.size)]
-
+            # first pass
             for row in range(self.size):
                 for col in range(self.size):
-                    for object in self.board[row][col]:
-                        if isinstance(object, Bee):
-                            self.move_bee(object, placeholder_board)
+                    for obj in self.board[row][col]:
+                        if isinstance(obj, Bee):
+                            self.move_bee(obj, placeholder_board)
                         else:
-                            placeholder_board[row][col].append(object)
-
+                            placeholder_board[row][col].append(obj)
+            # second pass
             for row in range(self.size):
                 for col in range(self.size):
                     contains_wasp = any(isinstance(obj, Wasp)
@@ -90,13 +91,30 @@ class Simulation:
                         placeholder_board[row][col] = [
                             obj for obj in placeholder_board[row][col] if (not isinstance(obj, Bee) or isinstance(obj, Wasp))]
 
+                    for obj in placeholder_board[row][col]:
+                        if isinstance(obj, Bee) and not isinstance(obj, Wasp):
+                            self.asign_flower_to_bee(obj)
             self.board = placeholder_board
 
-    def move_bee(self, object: Bee, placeholder_board):
-        # get the next move and update the object's position
-        new_row, new_col = object.get_next_move()
+    def move_bee(self, bee: Bee, placeholder_board):
+        # get the next move and update the obj's position
+        new_row, new_col = bee.get_next_move()
         new_row = max(0, min(new_row, self.size - 1))
         new_col = max(0, min(new_col, self.size - 1))
-        object.row = new_row
-        object.col = new_col
-        placeholder_board[new_row][new_col].append(object)
+        bee.row = new_row
+        bee.col = new_col
+        placeholder_board[new_row][new_col].append(bee)
+
+    def asign_flower_to_bee(self, bee: Bee):
+        # give each bee object a flower object to go to
+        if bee.flower is not None:
+            return  
+        
+        for row in range(self.size):
+            for col in range(self.size):
+                for obj in self.board[row][col]:
+                    if isinstance(obj, Flower):
+                        distance = ((bee.row - row) ** 2 + (bee.col - col) ** 2) ** 0.5  
+                        if distance <= bee.perception:
+                            bee.flower = obj
+                            return
