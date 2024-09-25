@@ -1,6 +1,7 @@
 import stdio
 import time
-from bee import Bee
+from bee import Bee, Wasp
+from beehive import BeeHive, HoneyBeeHive, DesertBeeHive, WaspHive
 
 
 class Simulation:
@@ -62,22 +63,37 @@ class Simulation:
         return len(self.board[row][col]) == 0
 
     def update(self):
+        # update the simulation for the number of steps
         for i in range(self.simulation_steps):
             self.print_board()
             time.sleep(self.simulation_speed)
+
             placeholder_board = [
                 [[] for _ in range(self.size)] for _ in range(self.size)]
+
             for row in range(self.size):
                 for col in range(self.size):
                     for object in self.board[row][col]:
                         if isinstance(object, Bee):
                             self.move_bee(object, placeholder_board)
                         else:
-                            placeholder_board[row][col].append(object)    
+                            placeholder_board[row][col].append(object)
+
+            for row in range(self.size):
+                for col in range(self.size):
+                    contains_wasp = any(isinstance(obj, Wasp)
+                                        for obj in placeholder_board[row][col])
+                    contains_wasp_hive = any(isinstance(
+                        obj, WaspHive) for obj in placeholder_board[row][col])
+
+                    if contains_wasp or contains_wasp_hive:
+                        placeholder_board[row][col] = [
+                            obj for obj in placeholder_board[row][col] if (not isinstance(obj, Bee) or isinstance(obj, Wasp))]
+
             self.board = placeholder_board
 
-
     def move_bee(self, object: Bee, placeholder_board):
+        # get the next move and update the object's position
         new_row, new_col = object.get_next_move()
         new_row = max(0, min(new_row, self.size - 1))
         new_col = max(0, min(new_col, self.size - 1))
