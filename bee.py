@@ -1,16 +1,17 @@
 from compass import Compass
+from beehive import BeeHive
 import math
 
 
 class Bee:
-    def __init__(self, row: int, col: int, speed: int, perception: int):
+    def __init__(self, row: int, col: int, speed: int, perception: int,home_hive:BeeHive):
         self.icon = 'b'
         self.row = row
         self.col = col
         self.compass = Compass(row, col, speed)
         self.flower = None
         self.perception = perception
-        self.home_hive
+        self.home_hive = home_hive
 
     def get_next_move(self):
         if self.flower is None:

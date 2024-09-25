@@ -1,5 +1,6 @@
 import stdio
 import time
+from bee import Bee
 
 
 class Simulation:
@@ -64,10 +65,10 @@ class Simulation:
                 for col in range(self.size):
                     for object in self.board[row][col]:
                         print(type(object).__name__)
-                        if (type(object).__name__ == "Bee"):
+                        if (isinstance(object, Bee)):
                             self.move_bee(object)
 
-    def move_bee(self,object):
+    def move_bee(self, object: Bee):
         new_row, new_col = object.get_next_move()
         if (new_row < 0):
             new_row = 0
