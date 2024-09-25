@@ -1,7 +1,6 @@
 import stdio
 import sys
 from simulation import Simulation
-from compass import Compass
 from tile_entities import Flower, HoneyBeeHive, DesertBeeHive, WaspHive, Wasp, DesertBee, HoneyBee, Pollen, BeeHive, Bee
 
 errors = {"INVALID_INPUT": "ERROR: Invalid argument: ", "TOO_FEW_ARGUMENTS":
@@ -29,16 +28,17 @@ def read_input_from_cmd():
 
 def read_map():
     # get the board configuration and the board setup from input
-    line_number = [0] # do some pyhton pass by object reference magic
+    line_number = [-1] # do some pyhton pass by object reference magic
     while True:
         if not stdio.hasNextLine():
             break
         line = stdio.readLine().strip().split()
-        if line_number == [0]:
+        if line_number == [-1]:
             handle_configuration_line(line)
+            line_number[0] += 1
         else:
+            line_number[0] += 1
             handle_board_line(line,line_number)
-        line_number[0] += 1
 
 
 def handle_configuration_line(line):
@@ -77,6 +77,7 @@ def handle_board_line(line, line_number):
             while num_pollen > 0:
                 if not stdio.hasNextLine():
                     break
+                line_number[0] += 1        
                 line = stdio.readLine().strip()
                 if simulation.pollen_type == 'f':
                     if not line.isdigit():
@@ -84,7 +85,6 @@ def handle_board_line(line, line_number):
                             errors["INVALID_OBJECT"] + str(line_number[0]))
                         sys.exit(1)
                 pollen_information.append(line)
-                line_number[0] += 1        
                 num_pollen -= 1
             new_flower = Flower(row, col, simulation.pollen_type)
 
@@ -97,8 +97,8 @@ def handle_board_line(line, line_number):
 
             validate_position(row, col, errors["HIVE_OCCUPIED"])
 
-            line = stdio.readLine().strip().split()
             line_number[0] += 1
+            line = stdio.readLine().strip().split()
             speed = int(line[0])
             perception_range = int(line[1])
             new_hive = HoneyBeeHive(row, col, num_entities)
@@ -111,8 +111,8 @@ def handle_board_line(line, line_number):
 
             validate_position(row, col, errors["HIVE_OCCUPIED"])
 
-            line = stdio.readLine().strip().split()
             line_number[0] += 1
+            line = stdio.readLine().strip().split()
             speed = int(line[0])
             perception_range = int(line[1])
             new_hive = BeeHive(row, col, num_entities)
@@ -125,8 +125,8 @@ def handle_board_line(line, line_number):
 
             validate_position(row, col, errors["HIVE_OCCUPIED"])
 
-            line = stdio.readLine().strip().split()
             line_number[0] += 1
+            line = stdio.readLine().strip().split()
             speed = int(line[0])
             perception_range = int(line[1])
             new_hive = DesertBeeHive(row, col, num_entities)
@@ -139,8 +139,8 @@ def handle_board_line(line, line_number):
 
             validate_position(row, col, errors["HIVE_OCCUPIED"])
 
-            line = stdio.readLine().strip().split()
             line_number[0] += 1
+            line = stdio.readLine().strip().split()
             speed = int(line[0])
             new_hive = WaspHive(row, col, num_entities)
 
@@ -169,7 +169,6 @@ def validate_position(row, col, error_message):
 
 
 def main():
-
     # main game loop
     read_input_from_cmd()
     read_map()
