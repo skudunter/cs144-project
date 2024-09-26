@@ -17,6 +17,7 @@ class Bee:
         self.pollen: Pollen = None
 
     def get_next_move(self) -> Tuple[int, int]:
+        # returns a tuple(int, int) of the next move according to the bee's state
         if (self.flower is None) and (self.pollen is None):
             return self.do_random_walk()
 
@@ -113,6 +114,9 @@ class Bee:
             steps -= 1
 
         return self.row, self.col
+
+    def get_distance_to_flower(self) -> float:
+        return ((self.row - self.flower.row) ** 2 + (self.col - self.flower.col) ** 2) ** 0.5
 
 
 class Wasp(Bee):

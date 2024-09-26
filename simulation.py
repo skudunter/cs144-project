@@ -66,6 +66,7 @@ class Simulation:
     def update(self):
         # update the simulation for the number of steps
         for i in range(self.simulation_steps):
+            # TODO remove for final handin
             self.print_board()
             time.sleep(self.simulation_speed)
 
@@ -82,6 +83,7 @@ class Simulation:
             # second pass
             for row in range(self.size):
                 for col in range(self.size):
+                    # kill bee if wasp is found
                     contains_wasp = any(isinstance(obj, Wasp)
                                         for obj in placeholder_board[row][col])
                     contains_wasp_hive = any(isinstance(
@@ -90,9 +92,10 @@ class Simulation:
                     if contains_wasp or contains_wasp_hive:
                         placeholder_board[row][col] = [
                             obj for obj in placeholder_board[row][col] if (not isinstance(obj, Bee) or isinstance(obj, Wasp))]
-
+                    # assign flower to bee and deassign if out of range
                     for obj in placeholder_board[row][col]:
                         if isinstance(obj, Bee) and not isinstance(obj, Wasp):
+                            self.de_asign_flower_to_bee(obj)
                             self.asign_flower_to_bee(obj)
             self.board = placeholder_board
 
@@ -107,8 +110,8 @@ class Simulation:
 
     def asign_flower_to_bee(self, bee: Bee):
         # give each bee object a flower object to go to
-        if bee.flower is not None:
-            return
+        # if bee.flower is not None:
+        #     return
 
         for row in range(self.size):
             for col in range(self.size):
@@ -120,3 +123,12 @@ class Simulation:
                         if distance <= bee.perception:
                             bee.flower = obj
                             return
+
+    def de_asign_flower_to_bee(self, bee: Bee):
+        # check if bee is still in range of the flower
+        #TODO add checks to see if flower still has pollen
+        if bee.flower is None:
+            return
+        if (bee.get_distance_to_flower() > bee.perception):
+            bee.flower = None
+            return
