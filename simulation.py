@@ -108,13 +108,15 @@ class Simulation:
     def asign_flower_to_bee(self, bee: Bee):
         # give each bee object a flower object to go to
         if bee.flower is not None:
-            return  
-        
+            return
+
         for row in range(self.size):
             for col in range(self.size):
                 for obj in self.board[row][col]:
                     if isinstance(obj, Flower):
-                        distance = ((bee.row - row) ** 2 + (bee.col - col) ** 2) ** 0.5  
+                        distance = ((bee.row - row) ** 2 +
+                                    (bee.col - col) ** 2) ** 0.5
+
                         if distance <= bee.perception:
                             bee.flower = obj
                             return
