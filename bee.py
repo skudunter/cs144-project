@@ -1,21 +1,22 @@
 from compass import Compass
 from beehive import BeeHive
 from flower import Pollen, Flower
+from typing import Tuple
 import math
 
 
 class Bee:
-    def __init__(self, row: int, col: int, speed: int, perception: int, home_hive: BeeHive | None):
+    def __init__(self, row: int, col: int, speed: int, perception: int, home_hive: BeeHive):
         self.icon = 'b'
         self.row = row
         self.col = col
         self.compass = Compass(row, col, speed)
-        self.flower: Flower | None = None
+        self.flower: Flower = None
         self.perception = perception
         self.home_hive = home_hive
-        self.pollen: Pollen | None = None
+        self.pollen: Pollen = None
 
-    def get_next_move(self) -> tuple[int, int]:
+    def get_next_move(self) -> Tuple[int, int]:
         if (self.flower is None) and (self.pollen is None):
             return self.do_random_walk()
 
@@ -28,16 +29,16 @@ class Bee:
             print("error: no condition met")
             return 0, 0
 
-    def do_random_walk(self) -> tuple[int, int]:
+    def do_random_walk(self) -> Tuple[int, int]:
         next_trajectory = self.compass.get_next_trajectory()
-        displacement = convert_radian_to_tuple(
+        displacement = convert_radian_to_Tuple(
             next_trajectory.get_direction_in_radians())
         distance = next_trajectory.get_distance()
         new_col, new_row = int(
             displacement[0] * distance), int(displacement[1] * distance)
         return new_row + self.row, new_col + self.col
 
-    def do_perception_walk(self) -> tuple[int, int]:
+    def do_perception_walk(self) -> Tuple[int, int]:
         # walk first diagonally then horizontally or vertically to the flower
         if self.flower is None:
             print("error: flower is None")
@@ -75,7 +76,7 @@ class Bee:
 
         return self.row, self.col
 
-    def do_walk_to_hive(self) -> tuple[int, int]:
+    def do_walk_to_hive(self) -> Tuple[int, int]:
         # walk first diagonally then horizontally or vertically to the hive
         if self.home_hive is None:
             print("error: home hive is None")
@@ -132,5 +133,5 @@ class DesertBee(Bee):
         self.icon = 'd'
 
 
-def convert_radian_to_tuple(radians):
+def convert_radian_to_Tuple(radians):
     return (round(math.cos(radians)), round(math.sin(radians)))
