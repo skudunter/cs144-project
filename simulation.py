@@ -97,6 +97,12 @@ class Simulation:
                         if isinstance(obj, Bee) and not isinstance(obj, Wasp):
                             self.de_asign_flower_to_bee(obj)
                             self.asign_flower_to_bee(obj)
+                    # check if bee is at flower if so take pollen
+                    for obj in placeholder_board[row][col]:
+                        if isinstance(obj, Bee) and not isinstance(obj, Wasp):
+                            if obj.check_if_bee_is_at_flower():
+                                obj.collect_pollen(
+                                    obj.flower.get_pollen())        
             self.board = placeholder_board
 
     def move_bee(self, bee: Bee, placeholder_board):
@@ -126,9 +132,11 @@ class Simulation:
 
     def de_asign_flower_to_bee(self, bee: Bee):
         # check if bee is still in range of the flower
-        #TODO add checks to see if flower still has pollen
+        # TODO add checks to see if flower still has pollen
         if bee.flower is None:
             return
         if (bee.get_distance_to_flower() > bee.perception):
             bee.flower = None
             return
+
+    

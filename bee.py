@@ -118,6 +118,14 @@ class Bee:
     def get_distance_to_flower(self) -> float:
         return ((self.row - self.flower.row) ** 2 + (self.col - self.flower.col) ** 2) ** 0.5
 
+    def collect_pollen(self, pollen: Pollen):
+        self.pollen = pollen
+
+    def check_if_bee_is_at_flower(self) -> bool:
+        if self.flower is None:
+            return False
+        return self.row == self.flower.row and self.col == self.flower.col
+
 
 class Wasp(Bee):
     def __init__(self, row: int, col: int, speed: int):

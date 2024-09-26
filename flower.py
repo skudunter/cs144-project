@@ -17,5 +17,11 @@ class Flower:
     def add_pollen(self, pollen: Pollen):
         self.pollens.append(pollen)
 
+    def get_pollen_length(self):
+        return len(self.pollens)
+
+    def get_pollen(self):
+        return self.pollens.pop()
+
     def get_position(self):
         return self.row, self.col
