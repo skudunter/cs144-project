@@ -1,11 +1,9 @@
 import stdio
 import sys
-import math
 from simulation import Simulation
 from bee import Bee, DesertBee, HoneyBee, Wasp
 from beehive import BeeHive, DesertBeeHive, HoneyBeeHive, WaspHive
 from flower import Flower, Pollen
-from compass import Compass
 
 
 errors = {"INVALID_INPUT": "ERROR: Invalid argument: ", "TOO_FEW_ARGUMENTS":
