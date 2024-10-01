@@ -22,10 +22,10 @@ class Bee:
             return self.do_random_walk()
 
         elif (self.flower is not None) and (self.pollen is None):
-            return self.do_perception_walk()
+            return self.do_walk_to_target(self.flower)
 
         elif self.pollen is not None:
-            return self.do_walk_to_hive()
+            return self.do_walk_to_target(self.home_hive)
         else:
             print("error: no condition met")
             return 0, 0
@@ -35,88 +35,46 @@ class Bee:
         displacement = convert_radian_to_Tuple(
             next_trajectory.get_direction_in_radians())
         distance = next_trajectory.get_distance()
-        new_col, new_row = int(
+        d_col, d_row = int(
             displacement[0] * distance), int(displacement[1] * distance)
-        return new_row + self.row, new_col + self.col
+        return d_row, d_col
 
-    def do_perception_walk(self) -> Tuple[int, int]:
-        # walk first diagonally then horizontally or vertically to the flower
-        if self.flower is None:
-            print("error: flower is None")
-            return 0, 0
+    def do_walk_to_target(self, target: Flower) -> Tuple[int, int]:
+        # walk first diagonally then horizontally or vertically to the target
+        d_row, d_col = 0, 0
+        if target is None:
+            print("error: target is None")
+            return d_row, d_col
 
-        steps = self.compass.get_next_trajectory().get_distance()
+        distance = self.compass.get_next_trajectory().get_distance()
 
-        while steps > 0 and self.row != self.flower.row and self.col != self.flower.col:
-            if self.flower.row > self.row:
-                self.row += 1
+        if distance > 0 and self.row != target.row and self.col != target.col:
+            if target.row > self.row:
+                d_row = distance
             else:
-                self.row -= 1
+                d_row = -distance
 
-            if self.flower.col > self.col:
-                self.col += 1
+            if target.col > self.col:
+                d_col = distance
             else:
-                self.col -= 1
-
-            steps -= 1
-
-        while steps > 0:
-            if self.row != self.flower.row:
-                if self.flower.row > self.row:
-                    self.row += 1
+                d_col = -distance
+        elif distance > 0:
+            if self.row != target.row:
+                if target.row > self.row:
+                    d_row = distance
                 else:
-                    self.row -= 1
+                    d_row = -distance
 
-            elif self.col != self.flower.col:
-                if self.flower.col > self.col:
-                    self.col += 1
+            elif self.col != target.col:
+                if target.col > self.col:
+                    d_col = distance
                 else:
-                    self.col -= 1
+                    d_col = -distance
 
-            steps -= 1
-
-        return self.row, self.col
-
-    def do_walk_to_hive(self) -> Tuple[int, int]:
-        # walk first diagonally then horizontally or vertically to the hive
-        if self.home_hive is None:
-            print("error: home hive is None")
-            return 0, 0
-
-        steps = self.compass.get_next_trajectory().get_distance()
-
-        while steps > 0 and self.row != self.home_hive.row and self.col != self.home_hive.col:
-            if self.home_hive.row > self.row:
-                self.row += 1
-            else:
-                self.row -= 1
-
-            if self.home_hive.col > self.col:
-                self.col += 1
-            else:
-                self.col -= 1
-
-            steps -= 1
-
-        while steps > 0:
-            if self.row != self.home_hive.row:
-                if self.home_hive.row > self.row:
-                    self.row += 1
-                else:
-                    self.row -= 1
-
-            elif self.col != self.home_hive.col:
-                if self.home_hive.col > self.col:
-                    self.col += 1
-                else:
-                    self.col -= 1
-
-            steps -= 1
-
-        return self.row, self.col
+        return d_row, d_col
 
     def get_distance_to_flower(self) -> float:
-        return ((self.row - self.flower.row) ** 2 + (self.col - self.flower.col) ** 2) ** 0.5
+        return math.floor(((self.row - self.flower.row) ** 2 + (self.col - self.flower.col) ** 2) ** 0.5)
 
     def collect_pollen(self, pollen: Pollen):
         self.pollen = pollen
@@ -125,6 +83,11 @@ class Bee:
         if self.flower is None:
             return False
         return self.row == self.flower.row and self.col == self.flower.col
+
+    def check_if_bee_is_at_hive(self) -> bool:
+        if self.home_hive is None:
+            return False
+        return self.row == self.home_hive.row and self.col == self.home_hive.col
 
 
 class Wasp(Bee):

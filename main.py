@@ -4,6 +4,7 @@ from simulation import Simulation
 from bee import Bee, DesertBee, HoneyBee, Wasp
 from beehive import BeeHive, DesertBeeHive, HoneyBeeHive, WaspHive
 from flower import Flower, Pollen
+from typing import Tuple, List
 
 
 errors = {"INVALID_INPUT": "ERROR: Invalid argument: ", "TOO_FEW_ARGUMENTS":
@@ -26,7 +27,7 @@ def read_cmd_arguments():
         stdio.write(errors["INVALID_INPUT"] + sys.argv[1])
         sys.exit(1)
     else:
-        simulation.change_gui_mode(bool(sys.argv[1]))
+        simulation.change_gui_mode(bool(int(sys.argv[1])))
 
 
 def read_map_input():
@@ -44,7 +45,7 @@ def read_map_input():
             handle_board_line(line, line_number)
 
 
-def handle_configuration_line(line):
+def handle_configuration_line(line: List[str]):
     # check if the configuration line is valid
     if len(line) != 4:
         stdio.write(errors["INVALID_CONFIGURATION"])
@@ -71,31 +72,39 @@ def handle_configuration_line(line):
     simulation.change_sorting_mode(line[3])
 
 
-def handle_board_line(line, line_number):
+def handle_board_line(line: List[str], line_number: List[int]):
     # handle each line of the board setup
     try:
         if line[0] == 'F':
             col, row, num_pollen = get_position_and_entities(line)
             pollen_information = []
             validate_position(row, col, errors["FLOWER_OCCUPIED"])
+
             while num_pollen > 0:
+
                 if not stdio.hasNextLine():
                     break
                 line_number[0] += 1
                 line = stdio.readLine().strip()
+
                 if simulation.pollen_type == 'f':
-                    if not line.isdigit():
+                    try:
+                        float(line)
+                    except ValueError:
                         stdio.write(
                             errors["INVALID_OBJECT"] + str(line_number[0]))
                         sys.exit(1)
-                pollen_information.append(line)
+                    pollen_information.append(float(line))
+                else:
+                    pollen_information.append(line)
                 num_pollen -= 1
+
             new_flower = Flower(row, col, simulation.pollen_type)
 
             for pollen_info in pollen_information:
                 new_flower.add_pollen(Pollen(pollen_info))
-
             simulation.add_entity(row, col, new_flower)
+
         elif line[0] == 'H':
             col, row, num_entities = get_position_and_entities(line)
 
@@ -108,8 +117,10 @@ def handle_board_line(line, line_number):
             new_hive = HoneyBeeHive(row, col, num_entities)
 
             for _ in range(num_entities):
-                simulation.add_entity(row,col,HoneyBee(row, col, speed, perception_range, new_hive))
+                simulation.add_entity(row, col, HoneyBee(
+                    row, col, speed, perception_range, new_hive))
             simulation.add_entity(row, col, new_hive)
+
         elif line[0] == 'B':
             col, row, num_entities = get_position_and_entities(line)
 
@@ -122,7 +133,9 @@ def handle_board_line(line, line_number):
             new_hive = BeeHive(row, col, num_entities)
 
             for _ in range(num_entities):
-                simulation.add_entity(row,col,Bee(row, col, speed, perception_range, new_hive))
+                simulation.add_entity(row, col, Bee(
+                    row, col, speed, perception_range, new_hive))
+
             simulation.add_entity(row, col, new_hive)
         elif line[0] == 'D':
             col, row, num_entities = get_position_and_entities(line)
@@ -136,8 +149,10 @@ def handle_board_line(line, line_number):
             new_hive = DesertBeeHive(row, col, num_entities)
 
             for _ in range(num_entities):
-                simulation.add_entity(row,col,DesertBee(row, col, speed, perception_range,new_hive))
+                simulation.add_entity(row, col, DesertBee(
+                    row, col, speed, perception_range, new_hive))
             simulation.add_entity(row, col, new_hive)
+
         elif line[0] == 'W':
             col, row, num_entities = get_position_and_entities(line)
 
@@ -149,8 +164,9 @@ def handle_board_line(line, line_number):
             new_hive = WaspHive(row, col, num_entities)
 
             for _ in range(num_entities):
-                simulation.add_entity(row,col,Wasp(row, col, speed))
+                simulation.add_entity(row, col, Wasp(row, col, speed))
             simulation.add_entity(row, col, new_hive)
+
         else:
             stdio.write(errors["INVALID_OBJECT"] + str(line_number[0]))
             sys.exit(1)
@@ -159,7 +175,8 @@ def handle_board_line(line, line_number):
         sys.exit(1)
 
 
-def get_position_and_entities(line):
+def get_position_and_entities(line) -> Tuple[int, int, int]:
+    # return the position and number of entities from the input line
     col = int(line[1])
     row = int(line[2])
     num_entities = int(line[3])
@@ -174,11 +191,10 @@ def validate_position(row, col, error_message):
 
 def do_main_game_loop():
     simulation.update()
-    # code to be ran after the simulation is done
+    simulation.make_summary()
 
 
 def main():
-    # main game loop
     read_cmd_arguments()
     read_map_input()
     do_main_game_loop()

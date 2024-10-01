@@ -12,8 +12,13 @@ class BeeHive:
     def get_position(self):
         return self.row, self.col
 
-    def collect_pollen(self, pollen):
+    def collect_pollen(self, pollen: Pollen):
+        if pollen is None:
+            return
         self.pollens.append(pollen)
+
+    def get_pollen_list(self) -> List[Pollen]:
+        return self.pollens
 
 
 class DesertBeeHive:
